@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "start": "nodemon server.ts"
+  },
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^5.3.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.3.2",
+    "socket.io": "^4.7.5",
+    "typescript": "^5.5.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.16.0"
+  }
+}
