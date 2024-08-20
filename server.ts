@@ -15,7 +15,7 @@ interface WebErrorInterface extends Error {
 }
 
 try {
-    mongoose.connect(`mongodb+srv://${process.env.MGDB_USERNAME}:${process.env.MGDB_PASSWORD}@main.8e8t3.mongodb.net/?retryWrites=true&w=majority&appName=main`).then(() => console.debug("Connected to MongoDB"))
+    mongoose.connect(`mongodb+srv://${process.env.MGDB_USERNAME}:${process.env.MGDB_PASSWORD}@main.8e8t3.mongodb.net/production?retryWrites=true&w=majority&appName=main`).then(() => console.debug("Connected to MongoDB"))
 } catch (err) {
     console.error(err)
 }
