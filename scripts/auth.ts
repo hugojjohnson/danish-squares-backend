@@ -19,10 +19,10 @@ export async function verifySession(req: Request, res: Response, next: NextFunct
 export async function tokenToUserId(token: string) {
     const session = await SessionModel.findById(token)
     if (session === null) {
-        throw new Error("Token is not valid.")
+        throw new WebError("Token is not valid.", 403)
     }
     if (session.active !== true) {
-        throw new Error("Session inactive. You have been logged out.")
+        throw new WebError("Session inactive. You have been logged out.", 403)
     }
     return session.user
 }
