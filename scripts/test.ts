@@ -1,13 +1,29 @@
-// Imports the Google Cloud client library
+import { Application, NextFunction, Request, Response } from "express";
+import BookletModel from "../schemas/Booklet";
 import * as textToSpeech from "@google-cloud/text-to-speech"
 const { SsmlVoiceGender, AudioEncoding } = textToSpeech.protos.google.cloud.texttospeech.v1;
-import * as fs from "fs"
 import * as util from "util"
-// Creates a client
+import * as fs from "fs"
+
 const client = new textToSpeech.TextToSpeechClient()
 
+export async function doStuff(req: Request, res: Response, next: NextFunction) {
+    const booklets = await BookletModel.find({})
+    for (const booklet of booklets) {
+        for (const word of booklet.words) {
+            if (fs.existsSync("./public/english/" + word.audio)) {
+                continue
+            }
+            await generateEnglish(word.english, word.danish)
+        }
+    }
+    console.log("Done!")
+    res.json({ success: true })
+}
+
+
 export const languageId = "dansk"
-export async function generateSpeech(english: string, text: string): Promise<{audio: string, audioSlow: string}> {
+export async function generateEnglish(english: string, text: string): Promise<{ audio: string, audioSlow: string }> {
     try {
         let id = text.replaceAll(" ", "-").toLowerCase()
         id = id.replaceAll(":", "-")
@@ -15,11 +31,11 @@ export async function generateSpeech(english: string, text: string): Promise<{au
         id = id.replaceAll(".", "")
         id = id.replaceAll("!", "")
         id = id.replaceAll("?", "")
-        
+
         // Slow request
-        await makeRequest("public/audio/" + languageId + "-slow-" + id + '.mp3', text, false, true)
-        await makeRequest("public/audio/" + languageId + "-" + id + '.mp3', text, false, false)
-        await makeRequest("public/english/" + languageId + "-" + id + '.mp3', english, true, false)
+        // makeRequest("public/audio/" + languageId + "-slow-" + id + '.mp3', text, false, true)
+        // makeRequest("public/audio/" + languageId + "-" + id + '.mp3', text, false, false)
+        makeRequest("public/english/" + languageId + "-" + id + '.mp3', english, true, false)
         return { audio: languageId + "-" + id + '.mp3', audioSlow: languageId + "-slow-" + id + '.mp3' }
     } catch (error) {
         console.error('ERROR:', error)

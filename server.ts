@@ -8,14 +8,16 @@ import 'dotenv/config';
 // User requires
 import * as auth from "./scripts/auth";
 import * as userAPI from "./scripts/userAPI";
+import * as audio from "./scripts/audio";
 import { WebError } from "./scripts/utils";
+import { doStuff } from "./scripts/test";
 
 interface WebErrorInterface extends Error {
     status?: number
 }
 
 try {
-    mongoose.connect(`mongodb+srv://${process.env.MGDB_USERNAME}:${process.env.MGDB_PASSWORD}@main.8e8t3.mongodb.net/production?retryWrites=true&w=majority&appName=main`).then(() => console.debug("Connected to MongoDB"))
+    mongoose.connect(`mongodb+srv://${process.env.MGDB_USERNAME}:${process.env.MGDB_PASSWORD}@main.8e8t3.mongodb.net/test?retryWrites=true&w=majority&appName=main`).then(() => console.debug("Connected to MongoDB"))
 } catch (err) {
     console.error(err)
 }
@@ -41,7 +43,7 @@ var allowCrossDomain = function (req: Request, res: Response, next: NextFunction
 }
 app.use(allowCrossDomain)
 app.use(cors({ credentials: true, origin: CURRENT_URL }))
-app.use('/public', express.static('public')) // serve static files
+app.use('/danish-squares/public', express.static('public')) // serve static files
 
 // async route handler wrapper. Thank you ChatGPT
 // const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
@@ -60,20 +62,25 @@ function asyncHandler<Params = {}, ResBody = {}, ReqBody = {}, ReqQuery = {}>(
 
 
 
-app.post("/users/sign-up/email", asyncHandler(userAPI.signUpWithEmail))
-app.get("/users/sign-in/username", asyncHandler(userAPI.signInWithEmail))
+app.post("/danish-squares/users/sign-up/email", asyncHandler(userAPI.signUpWithEmail))
+app.get("/danish-squares/users/sign-in/username", asyncHandler(userAPI.signInWithEmail))
 
 // app.use(asyncHandler(auth.verifySession))
 
 // Users
-app.get("/auth/get-updates", asyncHandler(userAPI.updateUser))
-app.post("/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
-app.post("/main/add-booklet", asyncHandler(auth.verifySession), asyncHandler(userAPI.addBooklet))
-app.get("/main/public-booklets", asyncHandler(auth.verifySession), asyncHandler(userAPI.getPublicBooklets))
-app.get("/main/shared-book", asyncHandler(userAPI.getSharedBook))
+app.get("/favicon.ico", (req: Request, res: Response, next: NextFunction) => res.send(""))
+
+app.get("/danish-squares/auth/get-updates", asyncHandler(userAPI.updateUser))
+app.post("/danish-squares/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
+app.post("/danish-squares/main/add-booklet", asyncHandler(auth.verifySession), asyncHandler(userAPI.addBooklet))
+app.get("/danish-squares/main/public-booklets", asyncHandler(auth.verifySession), asyncHandler(userAPI.getPublicBooklets))
+app.get("/danish-squares/main/shared-book", asyncHandler(userAPI.getSharedBook))
+app.post("/danish-squares/main/generate-audio", asyncHandler(auth.verifySession), asyncHandler(audio.generateAudio))
+
+// app.get("/dev", asyncHandler(doStuff))
 
 app.use(function (req, res, next) {
-    next(new WebError("Path not found", 404))
+    next(new WebError("Path not found: " + req.path, 404))
 })
 
 // error handler
@@ -85,6 +92,6 @@ app.use(function (err: WebErrorInterface | Error, req: Request, res: Response, n
     res.send(err.message)
 })
 
-const port = process.env.PORT || 5174
+const port = process.env.PORT || 3002
 app.listen(port)
-console.debug("Server started!")
+console.debug("Server started on port " + port + "!")

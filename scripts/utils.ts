@@ -49,3 +49,16 @@ export function validateSchema(req: Request, [querySchema, bodySchema]: [z.ZodSc
     }
 }
 
+// // Generate silent audio files
+// (async () => {
+//     try {
+//         for (let i = 1; i < 11; i++) {
+//             ffmpeg('60.mp3')
+//                 .inputOptions('-t 2') // 2s
+//                 .output(`silent/${i}.mp3`)
+//                 .run()
+//         }
+//     } catch (error) {
+//         console.error('Generating audio files:', error);
+//     }
+// })();

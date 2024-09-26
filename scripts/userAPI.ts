@@ -19,8 +19,8 @@ const B1 = z.object({
     username: z.string(),
     hash: z.string()
 })
-export async function signUpWithEmail(req: Request, res: Response, next: NextFunction) {
-    // validateSchema(req, [,B1])
+export async function signUpWithEmail(req: MyRequest<typeof Q1, typeof B1>, res: Response, next: NextFunction) {
+    validateSchema(req, [Q1,B1])
     if (req.body.username === undefined || req.body.hash === undefined) {
         throw new WebError("Details not entered correctly. Please try again.", 500)
     }
@@ -40,8 +40,9 @@ const Q2 = z.object({
     username: z.string(),
     hash: z.string()
 })
-export async function signInWithEmail(req: Request, res: Response, next: NextFunction) {
-    // validateSchema(req, [Q2])
+const B2 = z.object({})
+export async function signInWithEmail(req: MyRequest<typeof Q2, typeof B2>, res: Response, next: NextFunction) {
+    validateSchema(req, [Q2, B2])
     if (req.query.username === undefined || req.query.hash === undefined) {
         throw new WebError("Details not entered correctly. Please try again.", 500)
     }
@@ -110,7 +111,7 @@ export async function addBooklet(req: MyRequest<typeof Q4, typeof B4>, res: Resp
 
     const returnWords: { english: string, danish: string, audio: string, audioSlow: string }[] = []
     for (const word of req.body.booklet.words) {
-        const { audio, audioSlow } = await generateSpeech(word.danish)
+        const { audio, audioSlow } = await generateSpeech(word.english, word.danish)
         returnWords.push({ english: word.english, danish: word.danish, audio: audio, audioSlow: audioSlow })
     }
 
