@@ -68,7 +68,7 @@ app.get("/danish-squares/users/sign-in/username", asyncHandler(userAPI.signInWit
 // app.use(asyncHandler(auth.verifySession))
 
 // Users
-app.get("/favicon.ico", (req: Request, res: Response, next: NextFunction) => res.send(""))
+app.get("/test", (req: Request, res: Response, next: NextFunction) => res.send("Welcome to Danish Squares!"));
 
 app.get("/danish-squares/auth/get-updates", asyncHandler(userAPI.updateUser))
 app.post("/danish-squares/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
