@@ -43,7 +43,7 @@ var allowCrossDomain = function (req: Request, res: Response, next: NextFunction
 }
 app.use(allowCrossDomain)
 app.use(cors({ credentials: true, origin: CURRENT_URL }))
-app.use('/danish-squares/public', express.static('public')) // serve static files
+app.use('/public', express.static('public')) // serve static files
 
 // async route handler wrapper. Thank you ChatGPT
 // const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
@@ -62,20 +62,20 @@ function asyncHandler<Params = {}, ResBody = {}, ReqBody = {}, ReqQuery = {}>(
 
 
 
-app.post("/danish-squares/users/sign-up/email", asyncHandler(userAPI.signUpWithEmail))
-app.get("/danish-squares/users/sign-in/username", asyncHandler(userAPI.signInWithEmail))
+app.post("/users/sign-up/email", asyncHandler(userAPI.signUpWithEmail))
+app.get("/users/sign-in/username", asyncHandler(userAPI.signInWithEmail))
 
 // app.use(asyncHandler(auth.verifySession))
 
 // Users
 app.get("/test", (req: Request, res: Response, next: NextFunction) => res.send("Welcome to Danish Squares!"));
 
-app.get("/danish-squares/auth/get-updates", asyncHandler(userAPI.updateUser))
-app.post("/danish-squares/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
-app.post("/danish-squares/main/add-booklet", asyncHandler(auth.verifySession), asyncHandler(userAPI.addBooklet))
-app.get("/danish-squares/main/public-booklets", asyncHandler(auth.verifySession), asyncHandler(userAPI.getPublicBooklets))
-app.get("/danish-squares/main/shared-book", asyncHandler(userAPI.getSharedBook))
-app.post("/danish-squares/main/generate-audio", asyncHandler(auth.verifySession), asyncHandler(audio.generateAudio))
+app.get("/auth/get-updates", asyncHandler(userAPI.updateUser))
+app.post("/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
+app.post("/main/add-booklet", asyncHandler(auth.verifySession), asyncHandler(userAPI.addBooklet))
+app.get("/main/public-booklets", asyncHandler(auth.verifySession), asyncHandler(userAPI.getPublicBooklets))
+app.get("/main/shared-book", asyncHandler(userAPI.getSharedBook))
+app.post("/main/generate-audio", asyncHandler(auth.verifySession), asyncHandler(audio.generateAudio))
 
 // app.get("/dev", asyncHandler(doStuff))
 
