@@ -20,7 +20,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/fluent-ffmpeg": "^2.1.26",
-    "tsx": "^4.16.0"
+    "@types/fluent-ffmpeg": "^2.1.26"
   }
 }
