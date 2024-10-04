@@ -23,8 +23,8 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
     const eW = (word: string) => ("public/audio/eW/" + word).replaceAll(" ", "\\ ")
 
     const userId = await auth.tokenToUserId(req.query.token)
-    const unlearnedWords = (await WordModel.find({}))
-    const learnedWords = (await WordModel.find({}))
+    const unlearnedWords = (await WordModel.find({ owner: userId }))
+    const learnedWords = (await WordModel.find({ owner: userId }))
 
     const returnArr: string[] = []
     const practiceArr: string[] = []
