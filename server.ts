@@ -88,4 +88,4 @@ app.use(function (err: WebErrorInterface | Error, req: Request, res: Response, n
 
 const port = process.env.PORT || 3002
 app.listen(port)
-console.debug("Server started on port " + port + "!")
+console.debug((process.env.IS_COMPILED ? "Compiled " : "") + "Server started on port " + port + "!")
