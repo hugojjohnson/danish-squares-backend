@@ -7,8 +7,8 @@ import SessionModel from "../schemas/Session"
 import * as auth from "./auth"
 import { MyRequest, validateSchema, WebError } from "./utils"
 import { string, z } from "zod"
-import BookletModel from "../schemas/Booklet"
-import { generateSpeech } from "./tts"
+import WordModel from "../schemas/Word"
+import { generateSpeech, getID } from "./tts"
 
 // ========== Caches ==========
 let publicBookCache: { _id: string, owner: string, name: string, length: number }[] | undefined = undefined
@@ -87,8 +87,8 @@ const B5 = z.object({})
 export async function updateUser(req: MyRequest<typeof Q5, typeof B5>, res: Response, next: NextFunction) {
     validateSchema(req, [Q5, B5])
     const userId = await auth.tokenToUserId(req.query.token)
-    const userBooklets = await BookletModel.find({ owner: userId })
-    return res.json(userBooklets)
+    const userWords = await WordModel.find({ owner: userId })
+    return res.json(userWords)
 }
 
 
@@ -97,74 +97,34 @@ const Q4 = z.object({
     token: z.string()
 })
 const B4 = z.object({
-    booklet: z.object({
-        name: z.string(),
-        words: z.array(z.object({
-            english: z.string(),
-            danish: z.string()
-        }))
-    })
+    dW: z.string(),
+    dS: z.string(),
+    eW: z.string(),
+    eS: z.string()
 })
-export async function addBooklet(req: MyRequest<typeof Q4, typeof B4>, res: Response, next: NextFunction) {
+export async function addWord(req: MyRequest<typeof Q4, typeof B4>, res: Response, next: NextFunction) {
     validateSchema(req, [Q4, B4])
-    const userId = await auth.tokenToUserId(req.query.token)
-
-    const returnWords: { english: string, danish: string, audio: string, audioSlow: string }[] = []
-    for (const word of req.body.booklet.words) {
-        const { audio, audioSlow } = await generateSpeech(word.english, word.danish)
-        returnWords.push({ english: word.english, danish: word.danish, audio: audio, audioSlow: audioSlow })
-    }
-
-    const newBooklet = new BookletModel({
-        owner: userId,
-        name: req.body.booklet.name,
-        public: true,
-        words: returnWords
-    })
-    if (publicBookCache) {
-        const ownerUser = await UserModel.findById(newBooklet.owner)
-        publicBookCache.push({ _id: newBooklet._id, owner: ownerUser ? ownerUser.username : "", name: newBooklet.name, length: newBooklet.words.length })
-    }
-    await newBooklet.save()
-    return res.json(newBooklet)
-    // throw new WebError("Session could not be found.", 500)
-}
-
-const Q6 = z.object({ token: z.string(), username: z.string() })
-const B6 = z.object({})
-export async function getPublicBooklets(req: MyRequest<typeof Q6, typeof B6>, res: Response, next: NextFunction) {
-    validateSchema(req, [Q6, B6])
-    if (publicBookCache === undefined || publicBookCache.length === 0) {
-        publicBookCache = await updateBooklets()
-    }
-    return res.json(publicBookCache.filter(idk => idk.owner !== req.query.username))
+    const dW = req.body.dW.split("\n")
+    const dS = req.body.dS.split("\n")
+    const eW = req.body.eW.split("\n")
+    const eS = req.body.eS.split("\n")
     
-    async function updateBooklets() {
-        const publicBooklets = await BookletModel.find({ public: true })
-        const returnBooklets: { _id: string, owner: string, name: string, length: number }[] = []
-        for (const publicBooklet of publicBooklets) {
-            const ownerUser = await UserModel.findById(publicBooklet.owner)
-            returnBooklets.push({ _id: publicBooklet._id, owner: ownerUser ? ownerUser.username : "", name: publicBooklet.name, length: publicBooklet.words.length })
-        }
-        return returnBooklets
+    if (dW[0].length === 0 || dS[0].length === 0 || eW[0].length === 0 || eS[0].length === 0) {
+        throw new WebError("All fields must be filled in", 400)
     }
-}
+    if (dW.length !== dS.length || dW.length !== eW.length || dW.length !== eS.length) {
+        throw new WebError("Lengths do not match.", 400)
+    }
 
-const Q7 = z.object({ id: z.string() })
-const B7 = z.object({})
-export async function getSharedBook(req: MyRequest<typeof Q7, typeof B7>, res: Response, next: NextFunction) {
-    validateSchema(req, [Q7, B7])
-    const book = await BookletModel.findById(req.query.id)
-    if (book === null) { throw new WebError("Book could not be found", 500) }
-    return res.json({
-        name: book.name,
-        words: book.words.map(word => {
-            return {
-                danish: word.danish,
-                english: word.english,
-                audio: word.audio,
-                audioSlow: word.audioSlow
-            }
-        })
-    })
+    const userId = await auth.tokenToUserId(req.query.token)
+    
+    const returnJSON = []
+    for (let i = 0; i < dW.length; i++) {
+        await generateSpeech(dW[i], dS[i], eW[i], eS[i])
+        const id = getID(dW[i])
+        const newWord = new WordModel({ owner: userId, dW: dW[i], dS: dS[i], eW: eW[i], eS: eS[i], learned: false, starred: false, id: id })
+        await newWord.save()
+        returnJSON.push(newWord)
+    }
+    return res.send(returnJSON)
 }

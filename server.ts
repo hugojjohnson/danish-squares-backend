@@ -10,7 +10,6 @@ import * as auth from "./scripts/auth";
 import * as userAPI from "./scripts/userAPI";
 import * as audio from "./scripts/audio";
 import { WebError } from "./scripts/utils";
-import { doStuff } from "./scripts/test";
 
 interface WebErrorInterface extends Error {
     status?: number
@@ -25,6 +24,7 @@ try {
 const app: Application = express()
 
 const CURRENT_URL = process.env.CURRENT_URL || "*"
+const BASE_ROUTE = process.env.IS_COMPILED === "true" ? "" : "/danish-squares"
 
 // ========== Set-up middleware (You can move this into a different file if you want to) ==========
 // If you want to send JSON, you need this middleware, which sents the Content-Type header.
@@ -45,11 +45,6 @@ app.use(allowCrossDomain)
 app.use(cors({ credentials: true, origin: CURRENT_URL }))
 app.use('/public', express.static('public')) // serve static files
 
-// async route handler wrapper. Thank you ChatGPT
-// const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
-//     (req: Request, res: Response, next: NextFunction) =>
-//         Promise.resolve(fn(req, res, next)).catch(next)
-
 // An updated async route handler wrapper that allows you to specify the structure of the request.
 // All generic types default to {} to (hopefully) ensure you specify their type.
 function asyncHandler<Params = {}, ResBody = {}, ReqBody = {}, ReqQuery = {}>(
@@ -62,22 +57,21 @@ function asyncHandler<Params = {}, ResBody = {}, ReqBody = {}, ReqQuery = {}>(
 
 
 
-app.post("/users/sign-up/email", asyncHandler(userAPI.signUpWithEmail))
-app.get("/users/sign-in/username", asyncHandler(userAPI.signInWithEmail))
+app.post(BASE_ROUTE + "/users/sign-up/email", asyncHandler(userAPI.signUpWithEmail))
+app.get(BASE_ROUTE + "/users/sign-in/username", asyncHandler(userAPI.signInWithEmail))
 
 // app.use(asyncHandler(auth.verifySession))
 
 // Users
-app.get("/test", (req: Request, res: Response, next: NextFunction) => res.send("Welcome to Danish Squares!"));
+console.log(BASE_ROUTE)
+app.get(BASE_ROUTE + "/test", (req: Request, res: Response, next: NextFunction) => res.send("Welcome to Danish Squares!"));
 
-app.get("/auth/get-updates", asyncHandler(userAPI.updateUser))
-app.post("/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
-app.post("/main/add-booklet", asyncHandler(auth.verifySession), asyncHandler(userAPI.addBooklet))
-app.get("/main/public-booklets", asyncHandler(auth.verifySession), asyncHandler(userAPI.getPublicBooklets))
-app.get("/main/shared-book", asyncHandler(userAPI.getSharedBook))
-app.post("/main/generate-audio", asyncHandler(auth.verifySession), asyncHandler(audio.generateAudio))
+app.get(BASE_ROUTE + "/auth/get-updates", asyncHandler(userAPI.updateUser))
+app.post(BASE_ROUTE + "/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
+app.post(BASE_ROUTE + "/main/add-words", asyncHandler(auth.verifySession), asyncHandler(userAPI.addWord))
+app.get(BASE_ROUTE + "/main/generate-audio", asyncHandler(auth.verifySession), asyncHandler(audio.generateAudio))
 
-// app.get("/dev", asyncHandler(doStuff))
+// app.get(BASE_ROUTE + "/dev", asyncHandler(doStuff))
 
 app.use(function (req, res, next) {
     next(new WebError("Path not found: " + req.path, 404))

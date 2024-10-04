@@ -7,20 +7,25 @@ import * as util from "util"
 const client = new textToSpeech.TextToSpeechClient()
 
 export const languageId = "dansk"
-export async function generateSpeech(english: string, text: string): Promise<{audio: string, audioSlow: string}> {
+
+export function getID(dW: string): string {
+    let id = dW.replaceAll(" ", "-").toLowerCase()
+    id = id.replaceAll(":", "-")
+    id = id.replaceAll(",", "-")
+    id = id.replaceAll(".", "")
+    id = id.replaceAll("!", "")
+    id = id.replaceAll("?", "")
+    id = languageId + "-" + id + ".mp3"
+    return id
+}
+export async function generateSpeech(dW: string, dS: string, eW: string, eS: string): Promise<void> {
     try {
-        let id = text.replaceAll(" ", "-").toLowerCase()
-        id = id.replaceAll(":", "-")
-        id = id.replaceAll(",", "-")
-        id = id.replaceAll(".", "")
-        id = id.replaceAll("!", "")
-        id = id.replaceAll("?", "")
-        
+        const id = getID(dW)
         // Slow request
-        await makeRequest("public/audio/" + languageId + "-slow-" + id + '.mp3', text, false, true)
-        await makeRequest("public/audio/" + languageId + "-" + id + '.mp3', text, false, false)
-        await makeRequest("public/english/" + languageId + "-" + id + '.mp3', english, true, false)
-        return { audio: languageId + "-" + id + '.mp3', audioSlow: languageId + "-slow-" + id + '.mp3' }
+        await makeRequest("public/audio/dW/" + id, dW, false, false)
+        await makeRequest("public/audio/dS/" + id, dS, false, false)
+        await makeRequest("public/audio/eW/" + id, eW, true, false)
+        await makeRequest("public/audio/eS/" + id, eS, true, false)
     } catch (error) {
         console.error('ERROR:', error)
         throw new Error("Something happened.")
@@ -46,5 +51,3 @@ async function makeRequest(myPath: string, text: string, english: boolean, slow:
         console.error("Error: Could not write audio content.")
     }
 }
-
-// generateSpeech("hej!")
