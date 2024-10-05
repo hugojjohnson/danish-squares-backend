@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import Ffmpeg from 'fluent-ffmpeg';
 import { z } from 'zod';
 
 export class WebError extends Error {
@@ -52,9 +53,9 @@ export function validateSchema(req: Request, [querySchema, bodySchema]: [z.ZodSc
 // // Generate silent audio files
 // (async () => {
 //     try {
-//         for (let i = 1; i < 11; i++) {
-//             ffmpeg('60.mp3')
-//                 .inputOptions('-t 2') // 2s
+//         for (let i = 11; i < 31; i++) {
+//             Ffmpeg('60.mp3')
+//                 .inputOptions(`-t ${i}`) // 2s
 //                 .output(`silent/${i}.mp3`)
 //                 .run()
 //         }

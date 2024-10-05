@@ -41,6 +41,8 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
         returnArr.push(eW(newW))
         returnArr.push("public/silent/5.mp3")
         returnArr.push(dW(newW))
+        returnArr.push("public/silent/7.mp3")
+        returnArr.push(dW(newW))
         returnArr.push("public/silent/5.mp3")
         returnArr.push(dS(newW))
         returnArr.push("public/silent/7.mp3")
@@ -49,42 +51,10 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
         practiceArr.push(dS(newW))
         practiceArr.push(dW(newW))
     }
-
-    console.log(unlearnedWords)
-    console.log(learnedWords)
-    returnArr.push(dS(unlearnedWords[0].id))
     returnArr.push("public/beep.mp3")
 
     await combine(returnArr, "scripts/out.mp3")
     return res.sendFile(__dirname + "/out.mp3")
-
-    // =====================================
-    // const englishPath = (word: string) => ("public/english/" + word).replaceAll(" ", "\\ ")
-    // const durations: number[] = await Promise.all(req.body.words.map(async (word): Promise<number> => await duration(path(word.audio))))
-
-    // console.log(durations.filter(idk => idk > 9))
-
-    // if (durations.filter(idk => idk > 9).length > 0) { throw new WebError("Audio too long", 500) }
-
-    // const returnArr = []
-    // for (let i = 0; i < req.body.words.length; i++) {
-    //     for(let j = 0; j <= i; j++) {
-    //         const word = req.body.words[j]
-    //         returnArr.push(englishPath(word.audio))
-    //         returnArr.push("public/silent/" + Math.round(durations[i]) + ".mp3")
-    //         returnArr.push(path(word.audio))
-    //         returnArr.push("public/silent/" + Math.round(durations[i]) + ".mp3")
-    //     }
-    //     returnArr.push("public/beep.mp3")
-    //     returnArr.push("public/silent/2.mp3")
-    // }
-    // await combine(returnArr, "scripts/out.mp3")
-    // return res.sendFile(__dirname + "/out.mp3")
-
-    // if (session.active !== true) {
-    //     throw new WebError("Session inactive. You have been logged out.", 403)
-    // }
-    return next()
 }
 
 async function duration(filePath: string): Promise<number> {
