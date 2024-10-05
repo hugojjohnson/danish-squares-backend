@@ -32,14 +32,14 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
     for (let i = 0; i < Math.min(12, unlearnedWords.length); i++) {
         learn(unlearnedWords[i].id)
         if (i % 3 === 2) {
-            returnArr.concat(practiceArr)
+            returnArr.push(...practiceArr)
             returnArr.push("public/beep.mp3")
         }
     }
 
     function learn(newW: string) {
         returnArr.push(eW(newW))
-        returnArr.push("public/silent/5.mp3")
+        returnArr.push("public/silent/3.mp3")
         returnArr.push(dW(newW))
         returnArr.push("public/silent/7.mp3")
         returnArr.push(dW(newW))
