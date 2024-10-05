@@ -32,6 +32,8 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
 
     for (let i = 0; i < numberOfWords; i++) {
         learn(unlearnedWords[i].id)
+        unlearnedWords[i].learned = true
+        await unlearnedWords[i].save()
         if (i % 3 === 2) {
             returnArr.push(...practiceArr)
             returnArr.push("public/beep.mp3")
@@ -63,11 +65,11 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
         returnArr.push("public/silent/7.mp3")
         
         practiceArr.push(eS(newW))
-        returnArr.push("public/silent/7.mp3")
+        practiceArr.push("public/silent/7.mp3")
         practiceArr.push(dS(newW))
-        returnArr.push("public/silent/5.mp3")
+        practiceArr.push("public/silent/5.mp3")
         practiceArr.push(dW(newW))
-        returnArr.push("public/silent/3.mp3")
+        practiceArr.push("public/silent/3.mp3")
     }
     returnArr.push("public/beep.mp3")
 
