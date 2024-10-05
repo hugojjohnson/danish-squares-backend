@@ -28,12 +28,27 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
 
     const returnArr: string[] = []
     const practiceArr: string[] = []
+    const numberOfWords = Math.min(12, unlearnedWords.length)
 
-    for (let i = 0; i < Math.min(12, unlearnedWords.length); i++) {
+    for (let i = 0; i < numberOfWords; i++) {
         learn(unlearnedWords[i].id)
         if (i % 3 === 2) {
             returnArr.push(...practiceArr)
             returnArr.push("public/beep.mp3")
+        }
+    }
+
+    for (let i = 0; i < 20; i++) {
+        const randomWord = unlearnedWords[Math.floor(Math.random() * numberOfWords)].id
+        if (Math.random()> 0.75) {
+            returnArr.push(eS(randomWord))
+            returnArr.push("public/silent/7.mp3")
+            returnArr.push(dS(randomWord))
+            returnArr.push("public/silent/3.mp3")
+            returnArr.push(dW(randomWord))
+            returnArr.push("public/silent/3.mp3")
+        } else {
+
         }
     }
 
@@ -48,8 +63,11 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
         returnArr.push("public/silent/7.mp3")
         
         practiceArr.push(eS(newW))
+        returnArr.push("public/silent/7.mp3")
         practiceArr.push(dS(newW))
+        returnArr.push("public/silent/5.mp3")
         practiceArr.push(dW(newW))
+        returnArr.push("public/silent/3.mp3")
     }
     returnArr.push("public/beep.mp3")
 
