@@ -93,10 +93,10 @@ const B4 = z.object({
 })
 export async function addWord(req: MyRequest<typeof Q4, typeof B4>, res: Response, next: NextFunction) {
     validateSchema(req, [Q4, B4])
-    const dW = req.body.dW.split("\n")
-    const dS = req.body.dS.split("\n")
-    const eW = req.body.eW.split("\n")
-    const eS = req.body.eS.split("\n")
+    const dW = req.body.dW.split("\n").map(idk => idk.trim())
+    const dS = req.body.dS.split("\n").map(idk => idk.trim())
+    const eW = req.body.eW.split("\n").map(idk => idk.trim())
+    const eS = req.body.eS.split("\n").map(idk => idk.trim())
     
     if (dW[0].length === 0 || dS[0].length === 0 || eW[0].length === 0 || eS[0].length === 0) {
         throw new WebError("All fields must be filled in", 400)
