@@ -82,17 +82,6 @@ export async function signOut(req: MyRequest<typeof Q3, typeof B3>, res: Respons
     throw new WebError("Session could not be found.", 500)
 }
 
-const Q5 = z.object({ token: z.string() })
-const B5 = z.object({})
-export async function updateUser(req: MyRequest<typeof Q5, typeof B5>, res: Response, next: NextFunction) {
-    validateSchema(req, [Q5, B5])
-    const userId = await auth.tokenToUserId(req.query.token)
-    const userWords = await WordModel.find({ owner: userId })
-    return res.json(userWords)
-}
-
-
-
 const Q4 = z.object({
     token: z.string()
 })
@@ -127,4 +116,35 @@ export async function addWord(req: MyRequest<typeof Q4, typeof B4>, res: Respons
         returnJSON.push(newWord)
     }
     return res.send(returnJSON)
+}
+
+const Q5 = z.object({ token: z.string() })
+const B5 = z.object({})
+export async function updateUser(req: MyRequest<typeof Q5, typeof B5>, res: Response, next: NextFunction) {
+    validateSchema(req, [Q5, B5])
+    const userId = await auth.tokenToUserId(req.query.token)
+    const userWords = await WordModel.find({ owner: userId })
+    return res.json(userWords)
+}
+
+const Q6 = z.object({
+    token: z.string(),
+    id: z.string()
+})
+const B6 = z.object({})
+export async function star(req: MyRequest<typeof Q6, typeof B6>, res: Response, next: NextFunction) {
+    validateSchema(req, [Q6, B6])
+    const userId = await auth.tokenToUserId(req.query.token)
+    const myWord = await WordModel.findById(req.query.id )
+    if (myWord === null) {
+        throw new WebError("Word could not be found.", 500)
+    }
+    if (myWord.owner.toString() !== userId.toString()) {
+        console.log(myWord.owner)
+        console.log(userId)
+        throw new WebError("Word not owned by user.", 500)
+    }
+    myWord.starred = !myWord.starred
+    await myWord.save()
+    return res.json(myWord)
 }

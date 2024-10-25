@@ -23,8 +23,8 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
     const eW = (word: string) => ("public/audio/eW/" + word).replaceAll(" ", "\\ ")
 
     const userId = await auth.tokenToUserId(req.query.token)
-    const unlearnedWords = (await WordModel.find({ owner: userId }))
-    const learnedWords = (await WordModel.find({ owner: userId }))
+    const unlearnedWords = (await WordModel.find({ owner: userId, learned: false }))
+    const learnedWords = (await WordModel.find({ owner: userId, learned: true }))
 
     const returnArr: string[] = []
     const practiceArr: string[] = []
@@ -40,7 +40,29 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
         }
     }
 
-    for (let i = 0; i < 20; i++) {
+    // Also practice 5 learned words for every new word not introduced.
+    for (let i = 0; i < 5 * (12 - numberOfWords); i++) {
+        const randomWord = learnedWords[Math.floor(Math.random() * numberOfWords)].id
+        if (Math.random() > 0.75) {
+            returnArr.push(eS(randomWord))
+            returnArr.push("public/silent/7.mp3")
+            returnArr.push(dS(randomWord))
+            returnArr.push("public/silent/3.mp3")
+            returnArr.push(dW(randomWord))
+            returnArr.push("public/silent/3.mp3")
+        } else {
+            returnArr.push(eW(randomWord))
+            returnArr.push("public/silent/5.mp3")
+            returnArr.push(dW(randomWord))
+            returnArr.push("public/silent/3.mp3")
+            returnArr.push(dS(randomWord))
+            returnArr.push("public/silent/3.mp3")
+        }
+    }
+
+
+    // Practice each word an average of 2 times.
+    for (let i = 0; i < 2 * numberOfWords; i++) {
         const randomWord = unlearnedWords[Math.floor(Math.random() * numberOfWords)].id
         if (Math.random()> 0.75) {
             returnArr.push(eS(randomWord))
@@ -50,7 +72,12 @@ export async function generateAudio(req: MyRequest<typeof Q1, typeof B1>, res: R
             returnArr.push(dW(randomWord))
             returnArr.push("public/silent/3.mp3")
         } else {
-
+            returnArr.push(eW(randomWord))
+            returnArr.push("public/silent/5.mp3")
+            returnArr.push(dW(randomWord))
+            returnArr.push("public/silent/3.mp3")
+            returnArr.push(dS(randomWord))
+            returnArr.push("public/silent/3.mp3")
         }
     }
 

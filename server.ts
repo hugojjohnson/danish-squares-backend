@@ -16,7 +16,7 @@ interface WebErrorInterface extends Error {
 }
 
 try {
-    mongoose.connect(`mongodb+srv://${process.env.MGDB_USERNAME}:${process.env.MGDB_PASSWORD}@main.8e8t3.mongodb.net/main?retryWrites=true&w=majority&appName=main`).then(() => console.debug("Connected to MongoDB"))
+    mongoose.connect(`mongodb+srv://${process.env.MGDB_USERNAME}:${process.env.MGDB_PASSWORD}@main.8e8t3.mongodb.net/${process.env.IS_COMPILED === "true" ? "main" : "development"}?retryWrites=true&w=majority&appName=main`).then(() => console.debug("Connected to MongoDB"))
 } catch (err) {
     console.error(err)
 }
@@ -70,6 +70,7 @@ app.get(BASE_ROUTE + "/auth/get-updates", asyncHandler(userAPI.updateUser))
 app.post(BASE_ROUTE + "/users/sign-out", asyncHandler(auth.verifySession), asyncHandler(userAPI.signOut))
 app.post(BASE_ROUTE + "/main/add-words", asyncHandler(auth.verifySession), asyncHandler(userAPI.addWord))
 app.get(BASE_ROUTE + "/main/generate-audio", asyncHandler(auth.verifySession), asyncHandler(audio.generateAudio))
+app.get(BASE_ROUTE + "/star", asyncHandler(auth.verifySession), asyncHandler(userAPI.star))
 
 // app.get(BASE_ROUTE + "/dev", asyncHandler(doStuff))
 
